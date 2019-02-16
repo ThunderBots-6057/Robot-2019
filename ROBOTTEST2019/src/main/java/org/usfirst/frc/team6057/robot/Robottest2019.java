@@ -32,86 +32,89 @@ import edu.wpi.first.wpilibj.livewindow.LiveWindow;
  */
 public class Robottest2019 extends IterativeRobot {
 
-
-	// private static final String kCenterAuto = "Center Auto";
-	// private static final String kLeftAuto = "Left Auto";
-	// private static final String kRightAuto = "Right Auto";
-	// private String m_autoSelected;
-	// private SendableChooser<String> m_chooser=new SendableChooser<>();
-
 	// This line comments out the beginning code
 	/*
-	 * private static final String kDefaultAuto = "Default"; private static final
-	 * String kCustomAuto = "My Auto"; private String m_autoSelected; private
-	 * SendableChooser<String> m_chooser = new SendableChooser<>();
-	 * 
 	 * /** This function is run when the robot is first started up and should be
 	 * used for any initialization code.
 	 */
-	Joystick controller = new Joystick(0);
-	Joystick controller2 = new Joystick(1);
-          
+	Joystick controller;
+	Joystick controller2;
+
 	double rightTog;
 	double leftTog;
 	double conveyorIn;
 	double conveyorOut;
 
-
-     double armUp;
+	double armUp;
 	double armDown;
-
-
 
 	double frontpUp;
 	double frontpDown;
 
-
-
 	double backpUp;
 	double backpDown;
 
+	Solenoid front;
+	Solenoid back;
 
-
-	Solenoid front = new Solenoid(1);
-	Solenoid back = new Solenoid(0); 
-
-
-	
-	PWMVictorSPX frontLeft = new PWMVictorSPX(0);
-	PWMVictorSPX rearLeft = new PWMVictorSPX(1);
-	PWMVictorSPX frontRight = new PWMVictorSPX(2);
-	PWMVictorSPX rearRight = new PWMVictorSPX(3);
+	PWMVictorSPX frontLeft;
+	PWMVictorSPX rearLeft;
+	PWMVictorSPX frontRight;
+	PWMVictorSPX rearRight;
 
 	// Instantiation of collection and output systems
 	// Conveytor Belt
-	PWMVictorSPX leftConvey = new PWMVictorSPX(4);
-	PWMVictorSPX rightConvey = new PWMVictorSPX(5);
+	PWMVictorSPX leftConvey;
+	PWMVictorSPX rightConvey;
 	// Collector Arm extends up and down
-	PWMVictorSPX armside1 = new PWMVictorSPX(6);
-	PWMVictorSPX armside2= new PWMVictorSPX(7);// ----side of the arm
-// ----side of the arm
+	PWMVictorSPX armside1;
+	PWMVictorSPX armside2;// ----side of the arm
+	// ----side of the arm
 	// PWMVictorSPX rightArm = new PWMVictorSPX(7);
 
-	SpeedControllerGroup rightMotors = new SpeedControllerGroup(frontRight, rearRight);
-	SpeedControllerGroup leftMotors = new SpeedControllerGroup(frontLeft, rearLeft);
+	SpeedControllerGroup rightMotors;
+	SpeedControllerGroup leftMotors;
 
 	// Defines the variables as members of our Robot class
-
-	// Timer timer;
-	// private int switchside;
 
 	// Initializes the variables in the robotInit method, this method is called when
 	// the robot is initializing
 	@Override
 	public void robotInit() {
 
+		controller = new Joystick(0);
+		controller2 = new Joystick(1);
+		front = new Solenoid(1);
+		back = new Solenoid(0);
+
+		frontLeft = new PWMVictorSPX(0);
+		rearLeft = new PWMVictorSPX(1);
+		frontRight = new PWMVictorSPX(2);
+		rearRight = new PWMVictorSPX(3);
+
+		// Instantiation of collection and output systems
+
+		// Conveytor Belt
+		leftConvey = new PWMVictorSPX(4);
+		rightConvey = new PWMVictorSPX(5);
+
+		// Collector Arm extends up and down
+		armside1 = new PWMVictorSPX(6);// ----side of the arm
+		armside2 = new PWMVictorSPX(7);// ----side of the arm
+
+		// PWMVictorSPX rightArm = new PWMVictorSPX(7);
+
+		rightMotors = new SpeedControllerGroup(frontRight, rearRight);
+		leftMotors = new SpeedControllerGroup(frontLeft, rearLeft);
+
 		new Thread(() ->
 
-		{    UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
+		{
+			UsbCamera camera = CameraServer.getInstance().startAutomaticCapture();
 
 			UsbCamera camera1 = CameraServer.getInstance().startAutomaticCapture();
 
-			camera.setResolution(640,480);
+			camera.setResolution(640, 480);
 
 			camera1.setResolution(640, 480);
 
@@ -123,26 +126,15 @@ public class Robottest2019 extends IterativeRobot {
 
 			Mat output = new Mat();
 
-			while(!Thread.interrupted()){
-cvSink.grabFrame(source); 
+			while (!Thread.interrupted()) {
+				cvSink.grabFrame(source);
 
-Imgproc.cvtColor(source,output, Imgproc.COLOR_BGR2GRAY);
+				Imgproc.cvtColor(source, output, Imgproc.COLOR_BGR2GRAY);
 
-outputStream.putFrame(output);
+				outputStream.putFrame(output);
 			}
 		}).start();
 	}
-
-	
-
-
-		// m_chooser.addDefault(kLeftAuto, kLeftAuto);
-		// m_chooser.addObject(kCenterAuto, kCenterAuto);
-		// m_chooser.addObject(kRightAuto, kRightAuto);
-		// SmartDashboard.putData("Auto Choice", m_chooser);
-	
-
-	// @Override
 
 	/*
 	 * This autonomous (along with the chooser code above) shows how to select
@@ -160,43 +152,10 @@ outputStream.putFrame(output);
 
 	public void autonomousInit() {
 
-		// m_autoSelected=m_chooser.getSelected();
-
-		// System.out.println("Auto Selected: "+m_autoSelected);
-
-		// timer = new Timer();
-		// timer.reset();
-		// timer.start();
-		// String get_signal = null;
-
-		// while (get_signal == null) {
-
-		// Timer.delay(0.020);
-		// get_signal = DriverStation.getInstance().getGameSpecificMessage();
-
-		// if (get_signal.charAt(0) == 'L')
-
 		{
-			// switchside = 1;// signal indicates left switch is ours
-			// DriverStation.reportWarning("Left detected", false);
 
-		} // else {
-			// switchside = 0; // signal indicates right switch is ours
-			// DriverStation.reportWarning("Right detected", false);
-			// }
-
+		}
 	}
-	// return;//I would see if there's a use for this return statement. Right now it
-	// looks unneccessary. Create a branch in GitHub and see what happens without
-	// it.
-
-	// }
-
-	// public int get_switchside() {
-
-	// return switchside;
-
-	// }
 
 	/*
 	 * This function is called periodically during autonomous.
@@ -204,82 +163,7 @@ outputStream.putFrame(output);
 	@Override
 
 	public void autonomousPeriodic() {
-
-		// switch (m_autoSelected) {
-
-		// case kLeftAuto://If the robot starts from the left and...
-		// default:
-		// if(switchside==1)//your switch is the left
-		{
-			// if(timer.get()<4)
-			// backUp();
-			// if(timer.get()>4)
-			{
-				// driveStop();
-				// conveyor(1);
-			}
-			// else
-			// conveyor(0);
-		}
-		// else// your switch is the right
-		{
-			// if(timer.get()<4)
-			// backUp();
-			// if(timer.get()>4)
-			{
-				// driveStop();
-			}
-		}
-
-		// break;
-
-		// case kRightAuto://same thing as above, but starting from the right
-		// if(switchside==0)
-		{
-			// if(timer.get()<4)
-			// backUp();
-			// if(timer.get()>4&& timer.get()<5)
-			{
-				// driveStop();
-				// conveyor(1);
-			}
-			// else
-			// conveyor(0);
-		}
-		// else
-		{
-			// if(timer.get()<4)
-			// backUp();
-			// if(timer.get()>4)
-			{
-				// driveStop();
-			}
-		}
-		// break;
-		// case kCenterAuto://you should know the drill by now, but in case it's a bad
-		// day, this is if you're starting from the center
-		// if(timer.get()<2)
-		{
-			// if(switchside == 1)
-			// turnLeft();
-			// else
-			// turnRight();
-		}
-		// if(timer.get()>2 &&timer.get()<5)
-		{
-			// backUp();
-		}
-		// if(timer.get()>5 &&timer.get()<6)
-		{
-			// conveyor(1);
-			// driveStop();
-		}
-		// else
-		// conveyor(0);
-		// break;
 	}
-	// }
-	// driving direction methods
 
 	public void backUp() {
 
@@ -302,7 +186,6 @@ outputStream.putFrame(output);
 
 	public void turnLeft() { // Okay, this looks suspect to me, because of the positive/negative difference
 								// in the speed. Test, create a new branch to fix it, test again, repeat
-
 		rearLeft.set(-.3);
 		frontLeft.set(-.3);
 
@@ -336,28 +219,14 @@ outputStream.putFrame(output);
 		rightConvey.set(-speed);
 	}
 
-	//public void armExtend(int speed) {
-		//armside1.set(speed);
-	 
+	// Note to those who come after:
+	// as far as I can tell, getRawAxis(int) calls up a specific button/toggle on
+	// the controller; different buttons/toggles have different ints assigned to
+	// them
 
-		// public void pneumaticExtend1(int speed) {
-		//  	frontRightP.set(speed);
-		// 	frontLeftP.set(-speed);
-
-		//}
-
-
-	//}
-	
-//Note to those who come after:
-	//as far as I can tell, getRawAxis(int) calls up a specific button/toggle on the controller; different buttons/toggles have different ints assigned to them
-	
 	void drive() {
-		leftTog = controller.getRawAxis(1) * -0.75;//  for the controller and sets drive speed at 75%
+		leftTog = controller.getRawAxis(1) * -0.75;// for the controller and sets drive speed at 75%
 		rightTog = controller.getRawAxis(5) * 0.75;
-
-		// DriverStation.reportWarning("$L" + leftTog, false);
-		// DriverStation.reportWarning("$R" + rightTog, false);
 
 		rearLeft.set(leftTog);
 		frontLeft.set(leftTog);
@@ -366,95 +235,89 @@ outputStream.putFrame(output);
 		frontRight.set(rightTog);
 	}
 
-	void conveyorBelt() {
+	
+
+	void pneumaticExtend1() {// Pnematics go out
+		boolean ExtendUp1 = controller.getRawButton(4);
+		boolean Retreat1 = controller.getRawButton(1);
+
+		if (Retreat1) {
+			front.set(false);
+
+		} else if (ExtendUp1) {// Pnematics go in
+
+			front.set(true);
+
+		}
+	}
+
+	void pneumaticExtend2() {// Pnematics go out
+		boolean ExtendUp2 = controller.getRawButton(2);
+		boolean Retreat2 = controller.getRawButton(3);
+
+		if (Retreat2) {
+			back.set(false);
+
+		} else if (ExtendUp2) {// Pnematics go in
+
+			back.set(true);
+		}
+
+		}
+
+
+	void armExtend() {
+		armUp = controller2.getRawAxis(1);
+
+		if (armUp >= 0.1) {// sets motorsto help with going up
+			armside1.set(1);
+			armside2.set(1);
+			// System.out.println
+		} else if (armUp <= -0.1) {// sets motors to help with going down
+			armside1.set(-1);
+			armside2.set(-1);
+		} else {// sets motors to do nothing
+			armside1.set(0);
+			armside2.set(0);
+		}
+	}
+void conveyorBelt() {
 		conveyorIn = controller2.getRawAxis(3);
 		conveyorOut = controller2.getRawAxis(2);
 
-		 
-		if (conveyorIn >= 0.1) {// if you tell the conveyor to pull something in, this sets the motors 
+		if (conveyorIn >= 0.1) {// if you tell the conveyor to pull something in, this sets the motors
 			leftConvey.set(1);
-			System.out.println(leftConvey.get());
+			//System.out.println(leftConvey.get());
 			rightConvey.set(-1);
 			System.out.println(rightConvey.get());
-			//conveyorIn = controller.getRawAxis(3);
-		}
-		else if (conveyorOut >= 0.1) {//Same thing as above, except opposite
+			// conveyorIn = controller.getRawAxis(3);
+		} else if (conveyorOut >= 0.1) {// Same thing as above, except opposite
 			leftConvey.set(-1);
 			rightConvey.set(1);
-			//conveyorOut = controller.getRawAxis(2);
-		}
-		else {//the conveyor is doing nothing
+			// conveyorOut = controller.getRawAxis(2);
+		} else {// the conveyor is doing nothing
 			leftConvey.set(0);
 			rightConvey.set(0);
-		
-		}
 
 		}
-		
-	void armExtend (){
-		armUp =  controller2.getRawAxis(1);
-	
-
-		if (armUp>= 0.1){//sets motorsto help with going up 
-			armside1.set(1);
-			armside2.set(1);
-			//System.out.println
 	}
 
-	else if(armUp <=-0.1){//sets motors to help with going down
-		armside1.set(-1);
-		armside2.set(-1);
-	}
-	else {//sets motors to  do nothing 
-		armside1.set(0);
-		armside2.set(0);
-	}
-}
-
-
-
-void pneumaticExtend1 (){// Pnematics go out 
-boolean ExtendUp1 = controller.getRawButton(4);
-boolean Retreat1 =  controller.getRawButton(1); 
-
-if (Retreat1){
-front.set(false);
-
-}
-else if (ExtendUp1){//Pnematics go in
-
-front.set(true);
-
-}
-}
-
- void pneumaticExtend2(){// Pnematics go out 
-	boolean ExtendUp2 = controller.getRawButton(2);
-	boolean Retreat2 =  controller.getRawButton(3); 
 	
-	if (Retreat2){
-   back.set(false);
 
-	}
-	else if (ExtendUp2){//Pnematics go in
-	
-	back.set(true);
-	
-	}
-}
-	
 	/**
 	 * This function is called periodically during operator control.
 	 */
 	@Override
 
-	public void teleopPeriodic() { //this would be the draw portion of Processing (I know you've used Processing, Joe)
-		    drive();
-		 conveyorBelt();
-	     armExtend();
-	  pneumaticExtend1();; 
-	  pneumaticExtend2();
-	
+	public void teleopPeriodic() { // this would be the draw portion of Processing (I know you've used Processing,
+									// Joe)
+		drive();
+		conveyorBelt();
+		armExtend();
+		pneumaticExtend1();
+		;
+		pneumaticExtend2();
+
 	}
 
 	/**
@@ -464,7 +327,7 @@ front.set(true);
 	@Override
 	public void testPeriodic() {
 
-		LiveWindow.run();//Okay, you need to figure out why the run has a line through it. 
+		LiveWindow.run();// Okay, you need to figure out why the run has a line through it.
 		teleopPeriodic();
 
 	}
